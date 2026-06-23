@@ -6,9 +6,13 @@ project(auto_whammy_rp2040 C CXX ASM)
 
 pico_sdk_init()
 
+# Use your actual file names (no src/ folder)
 add_executable(auto_whammy_rp2040
-    src/main.cpp
+    srcmain.cpp
 )
+
+# Tell the compiler where to find tusb_config.h (in the root)
+target_include_directories(auto_whammy_rp2040 PRIVATE .)
 
 target_link_libraries(auto_whammy_rp2040
     pico_stdlib
