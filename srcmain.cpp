@@ -1,21 +1,17 @@
 /*
  * Auto-Whammy for CRKD Guitar (XInput) — Adafruit Feather RP2040 USB Host
- * Simplified version – no extra TinyUSB calls.
  */
 
 #include <stdio.h>
 #include <string.h>
-#include <algorithm>        // for std::min, std::max
+#include <algorithm>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/timer.h"
-#include "tusb.h"
-
-// Your header is named srctusbconfig.h – include it directly.
-#include "srctusbconfig.h"
+#include "tusb.h"          // ← this includes tusb_config.h (you created it)
 
 // ===================== CONFIGURATION =====================
-#define LEFT_TRIGGER_THRESHOLD  50      // 0..255
+#define LEFT_TRIGGER_THRESHOLD  50
 #define DEFAULT_FREQ_HZ         12.0f
 #define DEFAULT_INTENSITY       50.0f
 
@@ -115,14 +111,11 @@ static bool button_just_pressed(uint8_t pin) {
 void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance,
                       uint8_t const* desc_report, uint16_t desc_len) {
     (void)desc_report; (void)desc_len;
-    printf("Guitar HID mounted\n");
-    // Request a report – this will cause the device to send.
     tuh_hid_receive_report(dev_addr, instance);
 }
 
 void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
     (void)dev_addr; (void)instance;
-    printf("Guitar HID unmounted\n");
 }
 
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance,
@@ -131,13 +124,11 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance,
         memcpy(guitar_report, report, XINPUT_REPORT_SIZE);
         guitar_report_ready = true;
     }
-    // Re-queue next report
     tuh_hid_receive_report(dev_addr, instance);
 }
 
 // ===================== USB DEVICE CALLBACKS =====================
 
-// The report descriptor (same as before)
 static const uint8_t desc_hid_report[] = {
     0x05, 0x01,        // Usage Page (Generic Desktop)
     0x09, 0x05,        // Usage (Gamepad)
@@ -257,7 +248,7 @@ int main() {
     }
 }
 
-// Stubs for TinyUSB callbacks we didn't implement
+// Stubs
 void tuh_hid_set_report_complete_cb(uint8_t dev_addr, uint8_t instance,
                                      uint8_t report_id, hid_report_type_t report_type,
                                      uint8_t const* report, uint16_t len) {}
