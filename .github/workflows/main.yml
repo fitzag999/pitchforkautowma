@@ -1,0 +1,36 @@
+name: Build UF2
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Clone Pico SDK
+      run: git clone --depth 1 https://github.com/raspberrypi/pico-sdk.git
+
+    - name: Install ARM GCC
+      run: sudo apt update && sudo apt install -y gcc-arm-none-eabi
+
+    - name: Configure CMake
+      run: |
+        export PICO_SDK_PATH=$PWD/pico-sdk
+        mkdir build && cd build
+        cmake .. -DPICO_PLATFORM=rp2040 -DPICO_BOARD=pico
+
+    - name: Build
+      run: |
+        cd build
+        make -j4
+
+    - name: Upload UF2
+      uses: actions/upload-artifact@v4
+      with:
+        name: uf2
+        path: build/*.uf2
