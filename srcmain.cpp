@@ -4,7 +4,7 @@
 #include "pico/unique_id.h"
 #include "hardware/gpio.h"
 #include "hardware/timer.h"
-#include "tusb.h"
+#include "srctusbconfig.h"
 
 // ===================== CONFIGURATION =====================
 #define LEFT_TRIGGER_THRESHOLD  50    // 0..255
