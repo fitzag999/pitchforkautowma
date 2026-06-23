@@ -8,7 +8,7 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/timer.h"
-#include "tusb_config.h"          // ← this includes tusb_config.h (you created it)
+#include "tusb_config.h"
 
 // ===================== CONFIGURATION =====================
 #define LEFT_TRIGGER_THRESHOLD  50
