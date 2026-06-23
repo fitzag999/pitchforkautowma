@@ -1,6 +1,5 @@
 #ifndef _TUSB_CONFIG_H_
 #define _TUSB_CONFIG_H_
-
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -17,10 +16,8 @@
 //--------------------------------------------------------------------
 #define CFG_TUD_ENABLED             1
 #define CFG_TUD_MAX_SPEED           OPT_MODE_DEFAULT_SPEED
-
 #define CFG_TUD_VID                 0x2E8A
 #define CFG_TUD_PID                 0x0005
-
 #define CFG_TUD_HID                 (1)
 #define CFG_TUD_HID_BUFSIZE         64
 #define CFG_TUD_HID_EP_BUFSIZE      64
@@ -30,7 +27,6 @@
 //--------------------------------------------------------------------
 #define CFG_TUH_ENABLED             1
 #define CFG_TUH_MAX_SPEED           OPT_MODE_DEFAULT_SPEED
-
 #define CFG_TUH_HID                 (1)
 #define CFG_TUH_HID_EP_BUFSIZE      64
 #define CFG_TUH_HID_DEVICE_COUNT    1   // one guitar
@@ -38,5 +34,4 @@
 #ifdef __cplusplus
  }
 #endif
-
 #endif
