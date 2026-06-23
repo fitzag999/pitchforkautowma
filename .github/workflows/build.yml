@@ -1,39 +1,54 @@
-name: Build UF2
+name: Build Auto-Whammy UF2
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
 
-      - name: Clone Pico SDK (with submodules)
-        run: |
-          git clone --depth 1 --recurse-submodules https://github.com/raspberrypi/pico-sdk.git
-          echo "PICO_SDK_PATH=$PWD/pico-sdk" >> $GITHUB_ENV
+    - name: Clone Pico SDK
+      run: |
+        git clone https://github.com/raspberrypi/pico-sdk.git --depth 1
+        cd pico-sdk
+        git submodule update --init
 
-      - name: Install ARM GCC
-        run: sudo apt update && sudo apt install -y gcc-arm-none-eabi
+    - name: Create build directory
+      run: mkdir build
 
-      - name: Configure CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -DPICO_PLATFORM=rp2040 -DPICO_BOARD=pico
+    - name: Configure CMake
+      env:
+        PICO_SDK_PATH: ${{ github.workspace }}/pico-sdk
+      run: |
+        cd build
+        cmake ..
 
-      - name: Build
-        run: |
-          cd build
-          make -j4
+    - name: Build
+      run: |
+        cd build
+        make -j$(nproc)
 
-      - name: Upload UF2
-        uses: actions/upload-artifact@v4
-        with:
-          name: uf2
-          path: build/*.uf2
+    - name: Upload UF2 artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: auto_whammy_rp2040.uf2
+        path: build/auto_whammy_rp2040.uf2
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/auto_whammy_rp2040.uf2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
