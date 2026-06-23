@@ -1,40 +1,30 @@
-name: Build UF2
+cmake_minimum_required(VERSION 3.13)
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+include(pico_sdk_import.cmake)
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        submodules: 'false'  # we'll manually init pico-sdk later
+project(auto_whammy_rp2040 C CXX ASM)
 
-    - name: Clone Pico SDK with submodules
-      run: |
-        git clone --depth 1 --recurse-submodules https://github.com/raspberrypi/pico-sdk.git
-        echo "PICO_SDK_PATH=$PWD/pico-sdk" >> $GITHUB_ENV
+pico_sdk_init()
 
-    - name: Install ARM GCC
-      run: sudo apt update && sudo apt install -y gcc-arm-none-eabi
+add_executable(auto_whammy_rp2040
+    src/main.cpp
+)
 
-    - name: Configure CMake
-      run: |
-        mkdir build
-        cd build
-        cmake .. -DPICO_PLATFORM=rp2040 -DPICO_BOARD=pico
+target_link_libraries(auto_whammy_rp2040
+    pico_stdlib
+    hardware_gpio
+    hardware_timer
+    tinyusb_device
+    tinyusb_host
+)
 
-    - name: Build
-      run: |
-        cd build
-        make -j4
+target_compile_definitions(auto_whammy_rp2040 PRIVATE
+    CFG_TUSB_MCU=OPT_MCU_RP2040
+    CFG_TUSB_OS=OPT_OS_PICO
+    TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1
+)
 
-    - name: Upload UF2
-      uses: actions/upload-artifact@v4
-      with:
-        name: uf2
-        path: build/*.uf2
+pico_enable_stdio_uart(auto_whammy_rp2040 0)
+pico_enable_stdio_usb(auto_whammy_rp2040 0)
+
+pico_add_extra_outputs(auto_whammy_rp2040)
