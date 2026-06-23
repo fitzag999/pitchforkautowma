@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "pico/stdlib.h"
-#include "pico/unique_id.h"
 #include "hardware/gpio.h"
 #include "hardware/timer.h"
 #include "srctusbconfig.h"
